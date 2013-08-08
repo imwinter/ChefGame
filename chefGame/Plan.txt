@@ -1,0 +1,20 @@
+TODO:
+
+- Game Screen ( counter, skybox, scene, etc)
+
+- Food Generator ( Procedural, Endless)
+
+- Score System
+
+- Click Collision
+
+- Recipe List: Have 5 orders at once, score dependant on how many turns it takes to finish
+               the order. Orders can expire, resulting in point loss and eventual lose state.
+
+- Menu Screen
+
+- UI
+
+- Graphics (3D modeling)
+
+- High Score PHP system NUTTTTTYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY

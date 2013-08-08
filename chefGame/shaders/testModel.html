@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Feel the Beat</title>
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/food.js"></script>
+  <script src="js/foodGen.js"></script>
+</head>
+<body>
+
+<p>Chef Game</p>
+
+<script id='my-vertex-shader' type='x-shader/x-vertex'>
+varying vec2 vUV;
+
+void main() {
+  vUV = uv;
+  gl_Position = projectionMatrix *
+                modelViewMatrix *
+                vec4(position, 1.0);
+}
+</script>
+
+<script id='my-fragment-shader' type='x-shader/x-fragment'>
+
+varying vec2 vUV;
+
+void main() {
+  gl_FragColor = vec4(vUV.x, vUV.y, 0.0, 1.0);
+}
+</script>
+
+<script>
+
+/**
+ * Game object
+ * The highest level object representing entire game
+ */
+var Game = function() {
+};
+
+/**
+ * Initialize game state
+ */
+Game.prototype.init = function() {
+  var that = this;
+  // Create camera and set rotation
+  this.camera = new THREE.PerspectiveCamera(30, 16.0/9.0, 100, 10000);
+  this.camera.position.y = 300;
+  this.camera.position.z = 430;
+  this.camera.rotation.x = -(Math.PI)/8;
+  
+  
+  
+  var vertexShaderText = $('#my-vertex-shader').text();
+  var fragmentShaderText = $('#my-fragment-shader').text();
+  
+  this.myMaterial = new THREE.ShaderMaterial({
+    vertexShader: vertexShaderText,
+    fragmentShader: fragmentShaderText
+  });
+  this.scene = new THREE.Scene();
+
+  
+  /*
+   * Create Spotlight and Shadow Effects
+   *
+   */
+  var spotLight = new THREE.SpotLight( 0xffffff );
+  spotLight.position.set( 100, 1000, 100 );
+
+  spotLight.castShadow = true;
+
+  spotLight.shadowMapWidth = 1024;
+  spotLight.shadowMapHeight = 1024;
+
+  spotLight.shadowCameraNear = 500;
+  spotLight.shadowCameraFar = 4000;
+  spotLight.shadowCameraFov = 30;
+
+  this.scene.add( spotLight );
+  
+  
+  /* 
+   * Import Models
+   * Made by Matt Scorca and Ian Winter
+   */
+  this.figure = null;
+  var jsonLoader = new THREE.JSONLoader();
+  jsonLoader.load('models/stove.js', function ( geometry, materials ) {
+		that.figure =  new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+    that.figure.scale.set(40, 40, 40);
+	that.figure.rotation.y = Math.PI;
+    that.scene.add(that.figure);
+  });
+  
+  this.foodGen = new foodGenerator();
+  this.foodGen.init();
+  
+  this.renderer = new THREE.WebGLRenderer({antialias: true});
+  this.renderer.setSize(1280, 720);
+  this.renderer.setClearColor(0xeeeeee, 1.0);
+  document.body.appendChild(this.renderer.domElement);
+
+};
+
+/**
+ * Render game view for time t
+ */
+Game.prototype.render = function(t) {
+  this.renderer.render(this.scene, this.camera);
+};
+
+/**
+ * Start main game loop
+ */
+Game.prototype.start = function() {
+  var that = this;
+  var time0 = new Date().getTime(); // milliseconds since 1970
+  var loop = function() {
+    that.foodGen.update();
+    var time = new Date().getTime();
+    that.render((time - time0) * 0.001);
+    requestAnimationFrame(loop, that.renderer.domElement);
+  };
+  loop();  
+};
+
+//// 
+
+var game = new Game();
+game.init();
+game.start();
+
+</script>
+
+</body>
+</html>
+

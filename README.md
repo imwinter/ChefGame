@@ -1,4 +1,1 @@
-ChefGame
-========
-
-Chef Game
+Chef Game by Ian Winter and Matt Scorca
